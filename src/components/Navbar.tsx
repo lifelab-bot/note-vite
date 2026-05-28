@@ -22,7 +22,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
     <nav className="navbar">
       <div className="navbar__inner">
         <button className="navbar__brand" onClick={() => navigate("/")}>
-          <img src="/img/noteweb.svg" alt="Logo" className="navbar__logo" />
+          <img src={`${import.meta.env.BASE_URL}img/noteweb.svg`} alt="Logo" className="navbar__logo" />
           <span className="navbar__title">Note Space</span>
         </button>
 

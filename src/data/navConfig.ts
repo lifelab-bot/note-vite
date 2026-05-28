@@ -104,6 +104,13 @@ export const navItems: NavEntry[] = [
   },
   {
     kind: "dropdown",
+    label: "🌐 Web 開發",
+    items: [
+      { label: "學習紀錄總覽", to: "/docs/Web/intro" },
+    ],
+  },
+  {
+    kind: "dropdown",
     label: "⌨️ Unix 工具集",
     items: [
       { label: "Terminal 無法用 code . 呼叫 VS Code", to: "/docs/UnixTools/Terminal無法用con .呼叫vscode" },

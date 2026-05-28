@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkDirective from "remark-directive";
 import rehypeHighlight from "rehype-highlight";
+import rehypeRaw from "rehype-raw";
 import rehypeSlug from "rehype-slug";
 import "highlight.js/styles/github.css";
 import React, { type ComponentPropsWithoutRef } from "react";
@@ -87,7 +88,7 @@ function CodeBlock({ children, ...props }: ComponentPropsWithoutRef<"pre">) {
 
 // ── Image path fix ─────────────────────────────────────────
 function DocImage({ src, alt, ...props }: ComponentPropsWithoutRef<"img">) {
-  const fixed = src?.replace(/^.*static\/img\//, "/img/") ?? src;
+  const fixed = src?.replace(/^.*static\/img\//, `${import.meta.env.BASE_URL}img/`) ?? src;
   return <img src={fixed} alt={alt ?? ""} {...props} />;
 }
 
@@ -121,7 +122,7 @@ export default function DocPage() {
         {content && (
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkDirective, remarkAdmonitions]}
-            rehypePlugins={[rehypeHighlight, rehypeSlug]}
+            rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeSlug]}
             components={{ pre: CodeBlock, img: DocImage }}
           >
             {content}

@@ -1430,6 +1430,28 @@ html[data-theme="dark"] .docs-nav__link:hover {
   }
 }
 
+/* ────────────────────────────────
+   MARK  (light mode)
+   ──────────────────────────────── */
+.doc-content mark {
+  background: #fff3bf;
+  color: #1c1e21;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* Light mode: boost comment token contrast (#6a737d → #57606a, ~5.2:1 vs white) */
+.doc-content pre .hljs-comment,
+.doc-content pre .hljs-code,
+.doc-content pre .hljs-formula {
+  color: #57606a;
+}
+
 /* Art gallery: image wrapper always white; text must be dark on dark bg */
 html[data-theme="dark"] .art-card__title { color: var(--color-text); }
 html[data-theme="dark"] .art-card__desc  { color: var(--color-text-muted); }
+
+html[data-theme="dark"] .doc-content mark {
+  background: #5a4a00;
+  color: #f0e68c;
+}
