@@ -704,6 +704,7 @@ body {
   padding: 1px 5px;
   font-size: 87.5%;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  color: var(--color-text);
 }
 
 .code-block {
