@@ -1,0 +1,240 @@
+var e=`> 學習日期：2026-04-30  
+> 單元：階段一 L1 — 函式深入  
+> 狀態：✅ 全部通過
+
+---
+
+## 學習重點
+
+### \`def\` — 定義函式
+
+**比喻：** 函式就像一個食譜。你把步驟寫好、取個名字，之後要做這道菜只要叫名字就行，不用重寫步驟。
+
+\`\`\`python
+def greet(name):
+    return f'Hello, {name}!'
+
+greet('Ziv')   # 'Hello, Ziv！'
+\`\`\`
+
+- \`return\` 把值「傳回去」給呼叫者——就像廚房把料理端出來
+- 沒有 \`return\` 的函式回傳 \`None\`（做了事但沒端菜出來）
+
+\`\`\`python
+def say_hi(name):
+    print(f'Hi, {name}!')   # 有做事，但沒有 return
+
+result = say_hi('Ziv')   # 印出 Hi, Ziv!
+print(result)            # None ← 沒有回傳值
+\`\`\`
+
+---
+
+### 預設參數（Default Parameter）
+
+**比喻：** 點咖啡時，大部分人要熱的，所以店員預設做熱的——你不說就是熱的，要冰才需要特別說。
+
+\`\`\`python
+def repeat_print(text, times=3):
+    for i in range(times):
+        print(text)
+
+repeat_print('Hello')       # times 沒傳 → 用預設值 3，印 3 次
+repeat_print('Ziv', 5)      # times 傳入 5 → 覆蓋預設值，印 5 次
+\`\`\`
+
+**常見錯誤：預設參數放在前面**
+
+\`\`\`python
+# ❌ SyntaxError：預設參數不能在非預設參數前面
+def repeat_print(times=3, text):
+    ...
+
+# ✅ 正確：預設參數一定在最後面
+def repeat_print(text, times=3):
+    ...
+\`\`\`
+
+原因：\`repeat_print('Hello')\` 時，Python 不知道 \`'Hello'\` 要給哪個參數——如果預設的在前，就會產生歧義。
+
+---
+
+### \`return\` 回傳多個值
+
+**其實是回傳一個 tuple：**
+
+Python 並沒有真的「同時回傳兩個值」，而是把多個值**自動包成一個 tuple**，再回傳。
+
+\`\`\`python
+def bmi(height_m, weight_kg):
+    result = weight_kg / (height_m ** 2)
+    return round(result, 1), '正常'
+# 等同於 return (round(result, 1), '正常')
+\`\`\`
+
+**逐步追蹤：**
+
+\`\`\`python
+output = bmi(1.7, 65)
+# output = (22.5, '正常')  ← 是一個 tuple
+
+value, label = bmi(1.7, 65)
+# Python 把 (22.5, '正常') 拆開：value = 22.5，label = '正常'
+\`\`\`
+
+**常見錯誤：用一個變數接，拿到 tuple 而非數字**
+
+\`\`\`python
+result = bmi(1.7, 65)
+print(result)        # (22.5, '正常') ← 是 tuple
+print(result + 1)    # ❌ TypeError：tuple 不能加數字
+
+value, label = bmi(1.7, 65)
+print(value + 1)     # ✅ 23.5
+\`\`\`
+
+---
+
+### \`*args\` — 接收任意數量的引數
+
+**先搞清楚一件事：\`return\` 多個值 vs \`*args\` 是兩件完全不同的事**
+
+- \`return min(nums), max(nums)\` → 函式的**輸出**，你（寫函式的人）決定回傳幾個值，寫死在程式裡
+- \`*args\` → 函式的**輸入**，呼叫者決定要傳幾個值進來，每次呼叫可以不一樣
+
+**\`*args\` 真正解決的問題：讓呼叫者直接傳多個獨立的值，不用先包成 list**
+
+\`\`\`python
+# 沒有 *args → 呼叫者必須傳一個 list
+def stats(nums):
+    return max(nums)
+
+stats([3, 1, 7])    # ✅ 傳一個 list
+stats(3, 1, 7)      # ❌ 報錯，定義只有一個參數
+
+# 有 *args → 呼叫者直接傳個別的值
+def stats(*nums):
+    return max(nums)
+
+stats(3, 1, 7)          # ✅ nums = (3, 1, 7)
+stats(3, 1, 7, 2, 9)    # ✅ nums = (3, 1, 7, 2, 9)
+\`\`\`
+
+兩個版本都能算結果，差的是**呼叫者怎麼傳**：
+- 沒有 \`*\` → \`stats([3, 1, 7])\` 傳 list
+- 有 \`*\` → \`stats(3, 1, 7)\` 傳個別值
+
+**逐步追蹤：**
+
+\`\`\`python
+stats(3, 1, 7, 2)
+# Python 看到 *nums，把所有傳入的值包成 tuple
+# nums = (3, 1, 7, 2)
+# max((3,1,7,2)) = 7
+\`\`\`
+
+---
+
+### \`round(數字, 位數)\` — 控制小數點
+
+\`\`\`python
+round(22.4567, 1)   # 22.5  ← 保留 1 位小數
+round(3.14159, 2)   # 3.14  ← 保留 2 位小數
+round(3.14159)      # 3     ← 不傳第二個參數 → 四捨五入到整數
+\`\`\`
+
+第二個參數指定要保留幾位小數，是格式化輸出的常用工具。
+
+---
+
+## 習題一｜BMI 計算機
+
+**題目：** 寫一個函式 \`bmi(height_m, weight_kg)\`，回傳 BMI 值（小數點一位）與分類文字。
+
+| BMI | 分類 |
+|-----|------|
+| < 18.5 | 過輕 |
+| 18.5 ～ 24.9 | 正常 |
+| 25 ～ 29.9 | 過重 |
+| ≥ 30 | 肥胖 |
+
+**作答（✅ 通過）：**
+
+\`\`\`python
+def bmi(height_m, weight_kg):
+    z = (weight_kg/(height_m**2))
+    if z < 18.5:
+        return(round(z,1),'過輕')
+    elif z >= 18.5 and z <= 24.9:
+        return(round(z,1),'正常')
+    elif z >= 25 and z <= 29.9:
+        return(round(z,1),'過重')
+    elif z >= 30:
+        return(round(z,1),'肥胖')
+
+print(bmi(1.7,50))
+print(bmi(1.6,80))
+\`\`\`
+
+---
+
+## 習題二｜repeat_print 重複印出
+
+**題目：** 寫一個函式 \`repeat_print(text, times=3)\`，印出 text 共 times 次，預設 3 次。
+
+**作答（✅ 通過）：**
+
+\`\`\`python
+def repeat_print(text, times=3):
+    for i in range(times):
+        print(text)
+
+repeat_print('Hello')
+repeat_print('Ziv', 5)
+\`\`\`
+
+:::note 訂正過的觀念｜for 迴圈變數命名
+
+**原本的錯誤：** \`for text in range(times)\`
+
+想像有個抽屜標著 \`text\`，進入函式時裡面裝著 \`'Hello'\`。
+
+\`for text in range(times)\` 每圈會把 range 的數字「放進 text 這個抽屜」，原本的 \`'Hello'\` 就被擠出去了：
+
+\`\`\`
+第 1 圈：text = 0   ← 'Hello' 消失
+第 2 圈：text = 1
+第 3 圈：text = 2
+→ print(text) 印出 0、1、2，不是 Hello
+\`\`\`
+
+**改成 \`i\` 之後：**
+
+\`\`\`
+第 1 圈：i = 0，text 仍然是 'Hello'
+第 2 圈：i = 1，text 仍然是 'Hello'
+第 3 圈：i = 2，text 仍然是 'Hello'
+→ print(text) 印出 Hello、Hello、Hello ✓
+\`\`\`
+
+**\`_\` 又是什麼？**
+
+有時候會看到 \`for _ in range(times)\`，\`_\` 是 Python 慣例，意思是「我知道迴圈需要一個計圈數的變數，但我完全不打算用它」。用 \`i\` 和 \`_\` 都正確，\`_\` 更能表達「這個值我故意忽略」的意圖。
+:::
+
+---
+
+## 習題三｜stats 統計函式
+
+**題目：** 寫一個函式 \`stats(*nums)\`，接收任意數量的數字，回傳最大值、最小值、平均值。
+
+**作答（✅ 通過）：**
+
+\`\`\`python
+def stats(*nums):
+    return(max(nums), min(nums), round(sum(nums)/len(nums), 2))
+
+print(stats(3, 1, 7, 2))
+print(stats(20, 10))
+\`\`\`
+`;export{e as default};

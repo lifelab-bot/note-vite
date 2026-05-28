@@ -1,0 +1,87 @@
+var e=`## 🐍 Python｜字元的「元」是什麼意思？
+
+**Q：** 「字元」的「元」是「元素」的意思嗎？
+
+**A：** 不是「元素」的縮寫，而是「單元」的意思——最小的單位。「字元」= 一個字的最小單位，也就是一個字符（character）。
+
+\`\`\`python
+'hello'   # 5 個字元：h, e, l, l, o
+'台灣'    # 2 個字元：台, 灣
+\`\`\`
+
+\`len('hello')\` 回傳 5，是在數「有幾個字元」，也就是有幾個獨立的字符。
+
+類似的詞：
+- **字元**（character）：一個字符
+- **位元**（bit）：一個 bit，最小資料單位
+- **位元組**（byte）：8 個 bit 組成的單元
+
+「元」在這類詞裡都有「最基本的單位」的意思。
+
+---
+
+## 🐍 Python｜\`.get()\` 預設值到底何時生效？
+
+**Q：** 用 \`.get()\` 取值時，我以為不管 key 存不存在都會拿到預設值，結果拿到的是原本的值。
+
+**A：** \`.get()\` 的預設值**只有在 key 不存在時才用**。key 存在就回傳原值，預設值完全不看。
+
+\`\`\`python
+config = {'debug': True, 'timeout': 30}
+
+config.get('debug', False)    # True（key 存在，拿原值，不用 False）
+config.get('retries', 3)      # 3（key 不存在，用預設值）
+config.get('timeout', 60)     # 30（key 存在，拿原值 30，不是預設值 60）
+\`\`\`
+
+預設值的語意是「找不到才用這個備案」，不是「永遠回傳這個」。
+
+**記憶方法：**
+
+| key 存在？ | \`.get()\` 回傳 |
+|-----------|--------------|
+| ✅ 存在 | 原本的值 |
+| ❌ 不存在 | 你給的預設值 |
+
+
+---
+
+## ⚙️ 工具｜Google OAuth token 多久會過期？
+
+**Q：** Google Calendar 的授權 token 大概一週就失效嗎？
+
+**A：** 是的，Google OAuth token 在 **測試模式（Testing）** 的 app 大約 7 天會過期，這是 Google 的限制。
+
+解法：
+1. **改為已發布狀態**：Google Cloud Console → OAuth 同意畫面 → 發布應用程式，token 就改為幾個月才需要重新授權
+2. **每週手動重跑一次**：\`python3 daily_log.py '測試'\`，跳出瀏覽器授權即可
+
+重新授權步驟：刪掉舊 token（\`rm token.json\`）或直接在 Terminal 跑 \`python3 daily_log.py '測試'\`，會自動開瀏覽器要求重新登入。
+
+---
+
+## 🇬🇧 英文｜為什麼 \`keep an eye on\` 的 eye 是單數？
+
+**Q：** \`keep an eye on\` 的 eye 為什麼是單數？
+
+**A：** 這是固定慣用語（idiom），整個片語是一個意思的單位，不是真的在討論眼睛的數量。英文慣用語的單複數是固定搭配，沒有統一邏輯，把 \`keep an eye on\` 當成一個完整的積木記住就好。
+
+---
+
+## 🇬🇧 英文｜\`keep an ear out for\` 是什麼意思？
+
+**Q：** \`keep an ear out for\` 是什麼意思？可以從 \`keep an eye on\` 類推嗎？
+
+**A：** \`keep an ear out for something\` = 等待聽到某個特定消息，是被動等候的語感。不確定訊息何時出現，但會留意。
+
+兩者不能直接類推，語意也不同：
+
+| 片語 | 感覺 |
+|------|------|
+| \`keep an eye on ___\` | 持續盯著某個對象（主動監控） |
+| \`keep an ear out for ___\` | 等待聽到某個消息（被動等候） |
+
+> I'll keep an ear out for the deployment alert.（我會留意看有沒有部署通知。）
+
+\`keep an eye on\` 是固定片語，不能把 \`eye\` 換成 \`ear\` 就成立，兩者是獨立的慣用語。
+`;export{e as default};

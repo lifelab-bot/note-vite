@@ -1,0 +1,1 @@
+var e="## tar 轉成 tgz\n\n```bash\ngzip my_file.tar my_file.tgz\n```\n\n## tgz 轉成 tar\n\n```bash\ntar zcvf my_file.tar my_file.tgz\n```\n\n:::note\n`.tar.gz` 和 `.tgz` 是相同格式，只是副檔名不同。\n:::\n";export{e as default};

@@ -1,0 +1,292 @@
+var e=`> 學習日期：2026-05-12
+> 單元：階段一 L3 — List 完整操作
+> 狀態：✅ 全部通過（習題一 ✅、習題二 ✅、習題三 ✅）
+
+---
+
+## 學習重點
+
+### 常用 List 方法
+
+**兩類要分清楚：改原 list vs 回傳值**
+
+很多人混淆哪些方法「直接改原 list」、哪些「回傳值但不改原 list」：
+
+\`\`\`python
+nums = [3, 1, 4, 1, 5]
+
+# ── 直接修改原 list，沒有回傳值 ──
+nums.append(9)      # [3, 1, 4, 1, 5, 9]     尾端加入
+nums.insert(0, 0)   # [0, 3, 1, 4, 1, 5, 9]  指定位置插入
+nums.remove(1)      # 刪除第一個值為 1 的元素（只刪一個）
+nums.sort()         # 升序排序（直接改，不回傳）
+nums.reverse()      # 反轉（直接改，不回傳）
+
+# ── 回傳值，原 list 改變 ──
+last = nums.pop()   # 移除並「回傳」最後一個元素
+
+# ── 回傳值，原 list 不變 ──
+count = nums.count(1)  # 回傳值 1 出現幾次
+idx   = nums.index(4)  # 回傳值 4 的 index
+\`\`\`
+
+**常見錯誤：把 \`sort()\` 的結果賦值**
+
+\`\`\`python
+nums = [3, 1, 4]
+result = nums.sort()   # ❌ result = None！sort() 直接改原 list，不回傳新 list
+
+# 想「排序但保留原 list」→ 用 sorted()（回傳新 list，原 list 不動）
+result = sorted(nums)  # ✅ result = [1, 3, 4]，nums 仍是 [3, 1, 4]
+\`\`\`
+
+---
+
+### List Comprehension（串列生成式）
+
+**概念：用一行建立新 list**
+
+\`\`\`python
+# for 迴圈版（三行）
+squares = []
+for x in range(1, 6):
+    squares.append(x**2)
+
+# List Comprehension（一行）
+squares = [x**2 for x in range(1, 6)]
+# [1, 4, 9, 16, 25]
+\`\`\`
+
+**格式拆解：**
+
+\`\`\`
+[ 表達式      for 變數 in 範圍   if 條件（可省略）]
+  ↑ 放什麼      ↑ 跑什麼          ↑ 篩什麼
+\`\`\`
+
+**逐步追蹤（加條件）：**
+
+\`\`\`python
+evens = [x for x in range(6) if x % 2 == 0]
+
+# x=0 → 0%2==0 ✅ → 放入
+# x=1 → 1%2==1 ❌ → 跳過
+# x=2 → 2%2==0 ✅ → 放入
+# x=3 → 跳過
+# x=4 → 放入
+# x=5 → 跳過
+# 結果：[0, 2, 4]
+\`\`\`
+
+**\`if\` 的兩個位置，機制完全不同：**
+
+\`\`\`python
+arr = [72, 45, 88]
+
+# for 後面的 if → 控制「這圈要不要跑」，不跑的元素消失
+[x for x in arr if x >= 60]
+# 72：>=60 ✅ → 放入
+# 45：<60  ❌ → 這圈整個跳過，45 消失
+# 88：>=60 ✅ → 放入
+# 結果：[72, 88]（少了 45）
+
+# for 前面的 if...else → 每圈都跑，只決定「放什麼值」
+['pass' if x >= 60 else 'fail' for x in arr]
+# 72 → 'pass'
+# 45 → 'fail'（還是跑，只是值不同）
+# 88 → 'pass'
+# 結果：['pass', 'fail', 'pass']（三個都在）
+\`\`\`
+
+**記憶口訣：**
+- \`for\` 後面 → 只有 \`if\`（沒有 else），是**篩選**，不符合的元素消失
+- \`for\` 前面 → 一定要有 \`if...else\`，是**轉換**，每個元素保留，只是值不同
+
+---
+
+### 切片 Slice
+
+**格式：\`list[start:stop:step]\`**
+
+- \`start\`：從哪裡開始（**含**）
+- \`stop\`：到哪裡結束（**不含**）
+- \`step\`：每隔幾個取一個（預設 1，負數表示反向）
+
+\`\`\`python
+nums = [0, 1, 2, 3, 4, 5]
+#       0  1  2  3  4  5   ← index
+\`\`\`
+
+**逐步追蹤：**
+
+\`\`\`python
+nums[1:4]
+# 從 index 1，到 index 4 之前（不含 4）
+# 取 index 1, 2, 3 → [1, 2, 3]
+
+nums[::2]
+# 從頭到尾，每隔一個取
+# 取 index 0, 2, 4 → [0, 2, 4]
+
+nums[::-1]
+# step = -1 → 倒著走
+# [5, 4, 3, 2, 1, 0]
+\`\`\`
+
+**為什麼 stop 不含？**
+
+\`\`\`python
+nums = [0, 1, 2, 3, 4, 5]
+
+# 好處 1：很好算長度 → stop - start = 元素數
+nums[1:4]   # 4 - 1 = 3 個元素 → [1, 2, 3] ✓
+
+# 好處 2：切開後剛好接上，不重疊也不漏
+nums[:3]    # [0, 1, 2]
+nums[3:]    # [3, 4, 5]
+# 兩段合起來 = 整個 list，index 3 不會同時出現在兩段
+\`\`\`
+
+**常見錯誤：想包含某個 index，stop 要多寫 1**
+
+\`\`\`python
+nums[1:4]   # [1, 2, 3]  ← 不含 index 4
+nums[1:5]   # [1, 2, 3, 4] ← 想要到 index 4，stop 要寫 5
+\`\`\`
+
+---
+
+## 習題
+
+### 習題一｜list comprehension 3 的倍數（✅ 通過）
+
+**題目：** 用 list comprehension 產生 1～50 中所有 3 的倍數的 list
+
+**作答：**
+
+\`\`\`python
+arr1 = [x for x in range(1, 51) if x % 3 == 0]
+print(arr1)
+\`\`\`
+
+:::note 觀念補充｜range 可以直接放進 list comprehension
+
+\`range(1, 51)\` 本身就可以直接迭代，不需要先轉成 list：
+
+\`\`\`python
+# 不需要這樣（多一步）
+arr1 = [x for x in range(1, 51)]
+arr2 = [y for y in arr1 if y % 3 == 0]
+
+# 直接這樣就好
+arr2 = [x for x in range(1, 51) if x % 3 == 0]
+\`\`\`
+
+條件篩選可以直接寫在 comprehension 裡：\`[運算式 for 變數 in 範圍 if 條件]\`
+
+:::
+
+---
+
+### 習題二｜去頭去尾求平均（✅ 通過）
+
+**題目：** 使用者輸入至少 3 個數字，去掉最大和最小值後計算平均（到小數點兩位）
+
+**作答：**
+
+\`\`\`python
+users = input('請輸入至少3個數字：').split()
+users = map(int, users)
+users = list(users)
+users.sort()
+users = users[1:-1]
+
+print(round(sum(users) / len(users), 2))
+\`\`\`
+
+:::note 觀念補充｜三個關鍵步驟的順序
+
+1. **\`input().split()\`**：按空白切割輸入，得到字串 list。不能用 \`list(input())\`，那會把每個字元拆開（包含空格）。
+
+2. **先轉 int，再 sort**：\`sort()\` 對字串用字典序（\`'9' > '2'\`），對數字用數值大小。必須先把所有元素轉成 int，sort 才會正確。
+
+3. **\`[1:-1]\`**：排序後去掉第一個（最小值）和最後一個（最大值），剩下的就是要算平均的範圍。
+
+:::
+
+:::caution 過程中發現的兩個 bug
+
+**Bug 1：\`list(input())\` 拆成字元**
+
+輸入 \`15 20 30\` 時，\`list(input())\` 的結果是：
+
+\`\`\`python
+['1', '5', ' ', '2', '0', ' ', '3', '0']  # 每個字元都分開，空格也進去了
+\`\`\`
+
+正確做法是 \`input().split()\`，結果才會是：
+
+\`\`\`python
+['15', '20', '30']  # 按空白分割，保留完整數字
+\`\`\`
+
+**Bug 2：字串排序 vs 數字排序**
+
+在還沒轉 int 的狀態下執行 \`sort()\`，對 \`['9', '15', '20']\` 的結果是：
+
+\`\`\`python
+['15', '20', '9']  # '1' < '2' < '9'，所以 '9' 排到最後
+\`\`\`
+
+導致去掉頭尾時砍錯了，平均值算錯。先轉成 int 再 sort，才會得到正確的 \`[9, 15, 20]\`。
+
+:::
+
+---
+
+### 習題三｜成績 pass/fail（✅ 通過）
+
+**題目：** \`[72, 88, 45, 95, 60, 83]\`，用 list comprehension 標記 pass/fail
+
+**作答：**
+
+\`\`\`python
+arr1 = [72, 88, 45, 95, 60, 83]
+arr2 = ['pass' if x >= 60 else 'fail' for x in arr1]
+print(arr2)
+\`\`\`
+
+:::note 觀念補充｜if-else 在 list comprehension 裡的兩個位置
+
+list comprehension 的 \`if\` 有兩種用途，**位置不同，行為完全不同**：
+
+\`\`\`python
+# 位置一：for 後面 → 篩選（filter），不符合的元素被丟掉，不能接 else
+[x for x in arr1 if x >= 60]
+# → [72, 88, 95, 60, 83]（45 被過濾掉）
+
+# 位置二：for 前面 → 每個元素都進來，決定放什麼值
+['pass' if x >= 60 else 'fail' for x in arr1]
+# → ['pass', 'pass', 'fail', 'pass', 'pass', 'pass']（每個都被標記）
+\`\`\`
+
+格式：\`[值A if 條件 else 值B  for 變數 in 序列]\`
+
+---
+
+**另一個陷阱：\`print()\` 的回傳值是 \`None\`**
+
+\`\`\`python
+# 這樣寫，螢幕有印出文字，但 arr2 全是 None
+arr2 = [print('pass') if x >= 60 else print('fail') for x in arr1]
+# arr2 = [None, None, None, None, None, None]
+
+# 直接放字串，arr2 才會有內容
+arr2 = ['pass' if x >= 60 else 'fail' for x in arr1]
+# arr2 = ['pass', 'pass', 'fail', 'pass', 'pass', 'pass']
+\`\`\`
+
+\`print()\` 是「做一件事」，不是「給出一個值」。list comprehension 需要的是值，不是動作。
+
+:::
+`;export{e as default};
