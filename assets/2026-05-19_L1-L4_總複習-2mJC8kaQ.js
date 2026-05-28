@@ -20,7 +20,7 @@ var e=`> 學習日期：2026-05-19
 | 基礎 L3-2 | 切片 | ✅ |
 | 基礎 L4-1 | \`.get()\` 安全取值 | ✅ |
 | 基礎 L4-2 | \`.items()\` 遍歷 | ✅ |
-| 基礎 L4-3 | \`.get()\` 計數 | ⬜ |
+| 基礎 L4-3 | \`.get()\` 計數 | ✅ |
 | 基礎 L4-4 | Dict Comprehension + 條件 | ⬜ |
 | 基礎 L4-5 | 巢狀 dict 遍歷 | ⬜ |
 
@@ -746,5 +746,22 @@ for x, y in stock.items():
 
 ---
 
-*L4-3～L4-5、應用題通過後陸續補上*
+### 基礎 L4-3｜\`.get()\` 計數 ✅
+
+\`\`\`python
+colors = ['red', 'blue', 'red', 'green', 'blue', 'red', 'green']
+col = {}
+
+for ch in colors:
+    col[ch] = col.get(ch, 0) + 1
+print(f"{col}")
+\`\`\`
+
+:::note 觀念整理
+\`.get(key, 預設值)\` 讓你在 key 不存在時自動從 0 開始計數，不會因為 key 不存在而拋出 KeyError。每次迭代：先查這個 key 目前是幾次（不存在就是 0），加 1 後存回去。
+
+**常見錯誤：** 把 \`.get()\` 呼叫在迴圈變數上（\`ch.get(...)\`）而非計數表（\`col.get(...)\`）。\`ch\` 是字串，字串沒有 \`.get()\` 方法，會拋出 \`AttributeError\`。
+:::
+
+*L4-4～L4-5、應用題通過後陸續補上*
 `;export{e as default};
