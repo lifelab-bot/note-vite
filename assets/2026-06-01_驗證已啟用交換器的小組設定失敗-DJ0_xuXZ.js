@@ -1,6 +1,56 @@
-var e=`# Failover Cluster｜驗證已啟用交換器的小組設定 失敗排查
+var e=`# SQL Server FCI Lab 建置紀錄
 
-> 環境：Windows Server 2022 × VMware VM × 純 Failover Cluster（無 Hyper-V）
+## Lab 目標
+
+在 VMware vSphere 上建立一套 **SQL Server 2022 Failover Cluster Instance（FCI）** 環境，驗證資料庫高可用性架構——當 Active 節點發生故障，SQL 能自動切換至 Passive 節點並保留資料。
+
+## 環境
+
+| 項目 | 說明 |
+|------|------|
+| 平台 | VMware vSphere |
+| 作業系統 | Windows Server 2022 |
+| 資料庫 | SQL Server 2022 |
+| 網域控制器 | AD01 |
+| 叢集節點 | DB01、DB02（加域） |
+| 共用儲存 | iSCSI Server（未加域） |
+| 叢集虛擬名稱 | SQLFC |
+| 管理端 | Win11 + SSMS |
+
+## 叢集與網域
+
+Windows Failover Cluster 需要 Active Directory 網域，叢集節點（DB01、DB02）必須加域，叢集使用 AD 做驗證，虛擬網路名稱（SQLFC）也需要在 AD / DNS 註冊。iSCSI 儲存伺服器不需要加域，iSCSI 協定走獨立的儲存網路，不依賴 AD 驗證。
+
+## 建置流程
+
+**1. iSCSI 共用儲存**
+在 iSCSI Server 上建立虛擬磁碟（SQLServerCluster.vhdx），DB01 與 DB02 透過 iSCSI 連線掛載同一顆磁碟，作為 SQL FCI 的共用儲存。
+
+**2. Windows Failover Cluster 建立**
+在 DB01、DB02 安裝 Failover Clustering 功能，執行**叢集驗證精靈**確認通過後，才建立 Windows Failover Cluster。
+
+**3. SQL Server 2022 FCI 安裝**
+SQL FCI 不需要事先安裝獨立版 SQL Server。在 DB01 執行 SQL Server 安裝程式選「新增容錯移轉叢集安裝」，設定叢集虛擬名稱（SQLFC）、IP 與共用磁碟。完成後在 DB02 選「將節點加入叢集」。
+
+**4. SSMS 連線設定**
+SQL Server 2022 預設停用 TCP/IP 且具名執行個體使用動態 port，需在 SQL Server Configuration Manager 啟用 TCP/IP 並改為靜態 port 1433，開放防火牆後從 FCM 重啟 SQL Server 資源。
+
+**5. Failover 驗證**
+建立測試資料庫 ClusterDatabase，建立 Table 並插入資料，關閉 DB01 觸發 Failover，重連 SQLFC 確認資料保留且 DB02 接管成功。
+
+## 驗證結果
+
+| 項目 | 結果 |
+|------|------|
+| DB01 故障後自動切換至 DB02 | ✅ |
+| 虛擬名稱 SQLFC 持續可用 | ✅ |
+| 資料完整保留 | ✅ |
+
+---
+
+## 建置過程排查紀錄
+
+> 以下記錄建置過程中遇到的問題與解法。
 
 ---
 
@@ -145,6 +195,78 @@ Get-ClusterResource  # 資源是否 Online
 
 ---
 
+## SQL FCI Failover 實測驗證（完整流程）
+
+### 測試目標
+
+確認 SQL FCI Failover 功能正常：Active 節點關閉後，SQL 自動切換到 Passive 節點，且資料完整保留。
+
+### Failover 前準備
+
+\`\`\`sql
+-- 建立測試資料庫與資料表
+CREATE DATABASE [ClusterDatabase]
+USE [ClusterDatabase]
+
+-- 定義 Table 格式
+-- [Id]：INT IDENTITY(1,1) → 自動產生流水號，INSERT 時不需手動填
+-- [Name]：NVARCHAR(50) → 要填入的欄位
+-- CONSTRAINT PK_Table：設定 [Id] 為主鍵
+CREATE TABLE [dbo].[Table]
+(
+    [Id]   INT          IDENTITY(1,1),
+    [Name] NVARCHAR(50),
+    CONSTRAINT [PK_Table] PRIMARY KEY CLUSTERED ([Id])
+)
+
+-- 插入測試資料（在 Active 節點 DB01 上執行）
+INSERT INTO [dbo].[Table] ([Name]) VALUES ('Test Failover')
+
+-- 確認節點狀態（DB01 為 Active）
+SELECT * FROM [sys].[dm_os_cluster_nodes]
+-- DB01: is_current_owner = 1
+-- DB02: is_current_owner = 0
+
+SELECT @@SERVERNAME
+-- 回傳 SQLFC\\SQLFC
+\`\`\`
+
+### 觸發 Failover
+
+直接關閉 DB01（模擬節點故障）。
+
+SSMS 顯示：
+\`\`\`
+The connection is broken and recovery is not possible.
+The client driver attempted to recover the connection one or more times and all attempts failed.
+\`\`\`
+→ 短暫斷線為預期行為。
+
+### Failover 後驗證
+
+重新連線 \`SQLFC\\SQLFC,1433\` 後執行：
+
+\`\`\`sql
+SELECT * FROM [dbo].[Table]
+SELECT * FROM [sys].[dm_os_cluster_nodes]
+SELECT @@SERVERNAME
+\`\`\`
+
+結果：
+
+| 項目 | 結果 |
+|------|------|
+| Table 資料 | ✅ 'Test Failover' 仍存在 |
+| Active 節點 | ✅ DB02（is_current_owner=1） |
+| DB01 狀態 | down → joining → up（重新加入） |
+| @@SERVERNAME | ✅ SQLFC\\SQLFC（虛擬名稱不變） |
+
+### 結論
+
+**SQL FCI Failover 驗證通過。** 節點故障後叢集自動切換，資料完整保留，客戶端重連後繼續使用相同虛擬名稱，無需感知背後節點變化。
+
+---
+
 ## SSMS 無法連線到 SQL Failover Cluster（Error 40 Named Pipes）
 
 ### 問題
@@ -202,6 +324,18 @@ SQL Failover Cluster Instance 的服務是叢集資源，所有啟停操作都�
 ### 原因
 
 SQL Server **具名執行個體**預設使用**動態 port**，不是 1433。port 1433 是預設執行個體（MSSQLSERVER）的標準 port。客戶端需要 SQL Server Browser 服務才能找到動態 port，FCI 環境中 Browser 通常不作為叢集資源，導致連線失敗。
+
+**補充：為什麼 DB02 的 SQL Server 服務都是停止狀態？**
+
+這是正常現象。SQL FCI 同一時間只有一台節點是 Active（Owner），SQL Server 所有服務（含 SQL Server Browser）只在 Active 節點上運行。DB02 是 Passive 節點，服務停著是設計如此，不需要手動啟動。
+
+確認哪台是 Active（Owner）：
+\`\`\`sql
+SELECT * FROM [sys].[dm_os_cluster_nodes]
+-- is_current_owner = 1 → 該節點是 Active
+\`\`\`
+
+Failover 發生後 DB02 變成 Active，SQL 服務才會在 DB02 啟動。
 
 確認實際監聽 port：
 \`\`\`powershell
