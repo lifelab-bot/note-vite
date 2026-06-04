@@ -54,7 +54,7 @@ SQL Server 2022 預設停用 TCP/IP 且具名執行個體使用動態 port，需
 
 ---
 
-## 問題描述
+## [Windows Cluster] 驗證精靈失敗：Hyper-V WMI 命名空間不存在
 
 在 Failover Cluster Manager 執行「驗證設定精靈」時，以下測試失敗：
 
@@ -121,7 +121,7 @@ Switch Embedded Teaming（SET）是 Hyper-V 功能，未安裝 Hyper-V 的節點
 
 ---
 
-## 結論
+### 結論
 
 | 項目 | 說明 |
 |------|------|
@@ -132,7 +132,7 @@ Switch Embedded Teaming（SET）是 Hyper-V 功能，未安裝 Hyper-V 的節點
 
 ---
 
-## SQL Server 2022 Failover Cluster 安裝被擋住（KB953748）
+## [SQL FCI] 安裝被擋住（KB953748）
 
 ### 問題
 
@@ -267,7 +267,7 @@ SELECT @@SERVERNAME
 
 ---
 
-## SSMS 無法連線到 SQL Failover Cluster（Error 40 Named Pipes）
+## [SQL FCI] SSMS 無法連線（Error 40 Named Pipes）
 
 ### 問題
 
@@ -315,7 +315,7 @@ SQL Failover Cluster Instance 的服務是叢集資源，所有啟停操作都�
 
 ---
 
-## SQL 具名執行個體動態 Port 問題與靜態 Port 設定
+## [SQL FCI] 具名執行個體動態 Port 問題與靜態 Port 設定
 
 ### 問題
 
@@ -366,7 +366,7 @@ SQLFC\\SQLFC,1433
 
 ---
 
-## FCI 驗證：共用儲存與 Failover 測試
+## [SQL FCI] 共用儲存與 Failover 測試
 
 ### 共用儲存概念
 
@@ -397,7 +397,7 @@ SELECT @@SERVERNAME
 
 ---
 
-## VMware VM 上 Failover Cluster 正確網路架構
+## [Windows Cluster] VMware VM 正確網路架構
 
 VM 內**不做** NIC Teaming，冗餘由 ESXi 層處理：
 
