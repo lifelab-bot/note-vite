@@ -108,7 +108,13 @@ iisreset
 
 ## 日後修改訊息（推薦做法）
 
-直接編輯 style.css，找到 \`.StoreMarquee span:after\` 區塊：
+直接以**系統管理者身份**開啟記事本，編輯：
+
+\`\`\`
+C:\\inetpub\\wwwroot\\Citrix\\<StoreWebName>\\custom\\style.css
+\`\`\`
+
+找到 \`.StoreMarquee span:after\` 區塊，修改 \`content\` 的值：
 
 \`\`\`css
 .StoreMarquee span:after {
@@ -116,7 +122,9 @@ iisreset
 }
 \`\`\`
 
-修改後**另存新檔 → 編碼 UTF-8**，無需再跑 iisreset。
+存檔時選**另存新檔 → 編碼 UTF-8** 覆蓋存檔，**不需要再跑 iisreset**，重新整理瀏覽器即可生效。
+
+> ✅ 這是比使用 exe 更穩定的做法，不會有 ANSI 亂碼問題。
 
 ---
 
