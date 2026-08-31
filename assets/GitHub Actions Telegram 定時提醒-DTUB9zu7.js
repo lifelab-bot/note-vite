@@ -160,4 +160,9 @@ app.add_handler(CommandHandler("shuffle", shuffle))
 | 常用 | 日常對話、閱讀中高頻出現 | travel、meet、fresh |
 | 故事性與情感 | 能帶出情節、情緒、記憶感 | whisper、grief、longing |
 | 生活實用 | 可用在描述日常場景 | coffee、weekend、lunch |
+
+**版本紀錄：**
+- v1（2026-05-20 初版）：47 字，偏文學情感
+- v2（2026-05-20 擴充）：200 字，補充基礎動詞/名詞/形容詞
+- v3（2026-05-20 修訂）：移除 21 個冷僻字（yearn、melancholy、threshold 等），新增 21 個常用字（travel、coffee、excited 等）
 `;export{e as default};
